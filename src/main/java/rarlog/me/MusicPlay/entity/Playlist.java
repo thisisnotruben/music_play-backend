@@ -31,6 +31,9 @@ public class Playlist {
     @Column(nullable = false)
     private String name;
 
+    @Column(name = "cover_path", nullable = false)
+    private String coverPath;
+
     @ManyToOne
     @JoinColumn(name = "app_user_id", referencedColumnName = "id")
     private AppUser appUser;

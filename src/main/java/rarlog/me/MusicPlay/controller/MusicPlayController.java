@@ -1,6 +1,7 @@
 package rarlog.me.MusicPlay.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -40,8 +42,9 @@ public class MusicPlayController {
     })
     @PostMapping("/createPlaylist")
     public void createPlaylist(HttpServletRequest httpServletRequest,
-            @RequestParam("playlistName") String playlistName) {
-        musicPlayService.createPlaylist(getUsername(), playlistName);
+            @RequestParam("playlistName") String playlistName,
+            @RequestParam("file") Optional<MultipartFile> playlistCover) {
+        musicPlayService.createPlaylist(getUsername(), playlistName, playlistCover);
     }
 
     @Operation(summary = "Delete a playlist")

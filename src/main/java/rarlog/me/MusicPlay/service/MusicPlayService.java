@@ -1,10 +1,12 @@
 package rarlog.me.MusicPlay.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import rarlog.me.MusicPlay.dto.AlbumDto;
@@ -35,15 +37,24 @@ public class MusicPlayService {
     private final SongRepository songRepository;
     private final AlbumRepository albumRepository;
     private final ArtistRepository artistRepository;
+    private final StorageService storageService;
 
-    public void createPlaylist(String username, String playlistName) {
+    public void createPlaylist(String username, String playlistName, Optional<MultipartFile> file) {
         AppUser user = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
 
-        playlistRepository.save(Playlist.builder()
+        Playlist playlist = playlistRepository.save(Playlist.builder()
+                .coverPath("")
                 .name(playlistName)
                 .appUser(user)
                 .build());
+
+        if (file.isPresent()) {
+            String uploadedPlaylistPath = storageService.uploadPlaylistCover(
+                    user.getId(), playlist.getId(), file.get());
+            playlist.setCoverPath(uploadedPlaylistPath);
+            playlistRepository.save(playlist);
+        }
     }
 
     public void deletePlaylist(String username, long playlistId) {
@@ -55,7 +66,11 @@ public class MusicPlayService {
         for (PlaylistSong playlistSong : playlist.getPlaylistSongs()) {
             playlistSongRepository.delete(playlistSong);
         }
+        
         user.getPlaylists().remove(playlist);
+        if (!playlist.getCoverPath().isEmpty()) {
+            storageService.deletePlaylistCover(playlist.getCoverPath());
+        }
         playlistRepository.delete(playlist);
     }
 

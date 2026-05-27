@@ -22,6 +22,8 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0") // Source: https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl
 	implementation("io.jsonwebtoken:jjwt-api:0.13.0") // Source: https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
 
+    implementation("io.minio:minio:9.0.1") // Source: https://mvnrepository.com/artifact/io.minio/minio
+
 	runtimeOnly 'org.postgresql:postgresql'
 
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
