@@ -3,11 +3,14 @@ package rarlog.me.MusicPlay.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.apache.solr.client.solrj.request.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.params.CommonParams;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -59,30 +62,49 @@ public class SearchService {
         }
     }
 
-    public SearchResponseDto query(String queryName) throws SolrServerException, IOException {
-        queryName = String.join("\\ ", queryName.trim().split(" "));
+    public SearchResponseDto query(String queryValue, Optional<List<String>> optFilters)
+            throws SolrServerException, IOException {
 
-        String key = "name";
-        String queryString = String.format("%s:(%s), %s:(%s~), %s:(%s*), %s:(*%s*)",
-                key, queryName, key, queryName, key, queryName, key, queryName);
+        SolrQuery solrQuery = new SolrQuery(
+                String.join(", ", List.of("%s", "%s~").stream()
+                        .map(q -> String.format(q, queryValue.trim()))
+                        .collect(Collectors.toList())));
 
-        SolrQuery solrQuery = new SolrQuery(queryString);
-        solrQuery.add(solrQuery);
+        solrQuery.add(CommonParams.DF, "name");
+        solrQuery.add(CommonParams.INDENT, CommonParams.FALSE);
+        solrQuery.add(CommonParams.ROWS, String.valueOf(10));
+        solrQuery.add("q.op", "OR");
+        solrQuery.add("useParams", "");
+
+        if (optFilters.isPresent()) {
+            final List<String> validFilters = List.of(SearchDto.TYPE_ARTIST, SearchDto.TYPE_ALBUM, SearchDto.TYPE_SONG);
+            final List<String> filters = optFilters.get().stream()
+                    .map(s -> s.trim().toUpperCase())
+                    .filter(validFilters::contains)
+                    .map(s -> "type:".concat(s))
+                    .collect(Collectors.toList());
+
+            if (filters.size() < validFilters.size()) {
+                filters.stream().forEach(solrQuery::addFilterQuery);
+            }
+        }
+
+        QueryResponse queryResponse = client.query(solrQuery);
 
         List<Long> artistIds = new ArrayList<>();
         List<Long> albumIds = new ArrayList<>();
         List<Long> songIds = new ArrayList<>();
 
-        client.query(solrQuery).getBeans(SearchDto.class).stream().forEach(s -> {
+        queryResponse.getBeans(SearchDto.class).stream().forEach(s -> {
             switch (s.getType()) {
                 case SearchDto.TYPE_ARTIST:
-                    artistIds.add(s.getId());
+                    artistIds.add(s.getDbId());
                     break;
                 case SearchDto.TYPE_ALBUM:
-                    albumIds.add(s.getId());
+                    albumIds.add(s.getDbId());
                     break;
                 case SearchDto.TYPE_SONG:
-                    songIds.add(s.getId());
+                    songIds.add(s.getDbId());
                     break;
             }
         });
