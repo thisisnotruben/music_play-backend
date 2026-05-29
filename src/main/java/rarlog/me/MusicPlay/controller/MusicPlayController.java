@@ -40,7 +40,7 @@ public class MusicPlayController {
             @ApiResponse(responseCode = "200", description = "Ok", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class)))
     })
-    @PostMapping("/createPlaylist")
+    @PostMapping(value = "/createPlaylist", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void createPlaylist(HttpServletRequest httpServletRequest,
             @RequestParam("playlistName") String playlistName,
             @RequestParam("file") Optional<MultipartFile> playlistCover) {

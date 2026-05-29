@@ -19,3 +19,6 @@ storage:
   regionName: garage
   bucketName: "music-play-playlist"
   host: http://localhost:3900
+Solr:
+  url: http://localhost:8983/solr
+  core: music-play

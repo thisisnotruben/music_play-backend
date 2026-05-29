@@ -20,6 +20,7 @@ import rarlog.me.MusicPlay.repository.AlbumRepository;
 import rarlog.me.MusicPlay.repository.ArtistRepository;
 import rarlog.me.MusicPlay.repository.SongRepository;
 import rarlog.me.MusicPlay.service.AppUserService;
+import rarlog.me.MusicPlay.service.SearchService;
 
 @Configuration
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class DevConfig {
     private final ArtistRepository artistRepository;
     private final AppUserService appUserService;
     private final SongRepository songRepository;
+    private final SearchService searchService;
 
     @Bean
     public CommandLineRunner initDevEnv(@Value("${misc.dataPath}") String dataPath) {
@@ -65,6 +67,7 @@ public class DevConfig {
                             .collect(Collectors.toList()));
                 });
             });
+            searchService.indexDatabase();
         };
     }
 

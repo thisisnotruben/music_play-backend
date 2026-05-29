@@ -24,6 +24,8 @@ dependencies {
 
     implementation("io.minio:minio:9.0.1") // Source: https://mvnrepository.com/artifact/io.minio/minio
 
+    implementation("org.apache.solr:solr-solrj:10.0.0") // Source: https://mvnrepository.com/artifact/org.apache.solr/solr-solrj
+
 	runtimeOnly 'org.postgresql:postgresql'
 
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
