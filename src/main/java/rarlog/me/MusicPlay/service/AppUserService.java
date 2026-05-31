@@ -7,8 +7,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import rarlog.me.MusicPlay.dto.AccountCreateDto;
-import rarlog.me.MusicPlay.entity.AppUser;
+import rarlog.me.dto.AccountCreateDto;
+import rarlog.me.entity.AppUser;
 import rarlog.me.MusicPlay.exception.AccountAlreadyExistsException;
 import rarlog.me.MusicPlay.exception.UserNotFoundException;
 import rarlog.me.MusicPlay.repository.AppUserRepository;

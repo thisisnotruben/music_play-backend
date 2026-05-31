@@ -19,10 +19,10 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import rarlog.me.MusicPlay.dto.AccountCreateDto;
-import rarlog.me.MusicPlay.dto.ErrorResponseDto;
-import rarlog.me.MusicPlay.dto.LoginResponseDto;
 import rarlog.me.MusicPlay.service.AppUserService;
+import rarlog.me.dto.AccountCreateDto;
+import rarlog.me.dto.ErrorResponseDto;
+import rarlog.me.dto.LoginResponseDto;
 
 @Validated
 @RestController

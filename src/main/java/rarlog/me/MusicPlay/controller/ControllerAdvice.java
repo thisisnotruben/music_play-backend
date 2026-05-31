@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import rarlog.me.MusicPlay.dto.ErrorResponseDto;
+import rarlog.me.dto.ErrorResponseDto;
 import rarlog.me.MusicPlay.exception.AccountAlreadyExistsException;
 import rarlog.me.MusicPlay.exception.ArtistNotFoundException;
 import rarlog.me.MusicPlay.exception.PlaylistNotFoundException;

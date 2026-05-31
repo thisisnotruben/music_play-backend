@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import rarlog.me.MusicPlay.dto.SearchResponseDto;
-import rarlog.me.MusicPlay.service.SearchService;
+import rarlog.me.Service.SearchService;
+import rarlog.me.dto.SearchResponseDto;
 
 @RestController
 @RequestMapping("/api/v1")

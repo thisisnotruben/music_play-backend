@@ -9,7 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.RequiredArgsConstructor;
-import rarlog.me.MusicPlay.entity.AppUser;
+import rarlog.me.entity.AppUser;
 
 @RequiredArgsConstructor
 public class AppUserPrincipal implements UserDetails {

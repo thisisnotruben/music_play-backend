@@ -1,5 +1,6 @@
 package rarlog.me.MusicPlay;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,14 +18,21 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import lombok.RequiredArgsConstructor;
 import rarlog.me.MusicPlay.controller.AccountController;
+import rarlog.me.MusicPlay.repository.AlbumRepository;
+import rarlog.me.MusicPlay.repository.ArtistRepository;
+import rarlog.me.MusicPlay.repository.SongRepository;
 import rarlog.me.MusicPlay.security.AppUserPrincipalDetailsService;
 import rarlog.me.MusicPlay.security.JwtFilter;
+import rarlog.me.Service.SearchService;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class Config {
 
+    private final ArtistRepository artistRepository;
+    private final AlbumRepository albumRepository;
+    private final SongRepository songRepository;
     private final JwtFilter jwtFilter;
 
     @Bean
@@ -63,15 +71,11 @@ public class Config {
         return config.getAuthenticationManager();
     }
 
-    // @Bean
-    // public OpenAPI OpenAPI() {
-    // return OpenAPI().info(new Info()
-    // .title("Music Play Service")
-    // .description("Backend used to retrieve music metadata along with explore
-    // feed")
-    // .version("1.0.0")
-    // .license(new License()
-    // .name("MIT")
-    // .url("https://opensource.org/license/MIT")));
-    // }
+    @Bean
+    public SearchService searchService(
+            @Value("${search.url}") String searchUrl,
+            @Value("${search.core}") String searchCore) {
+        return new SearchService(searchUrl, searchCore, artistRepository, albumRepository, songRepository);
+    }
+
 }

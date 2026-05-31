@@ -21,11 +21,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import rarlog.me.MusicPlay.dto.AlbumDto;
-import rarlog.me.MusicPlay.dto.AllMusicDto;
-import rarlog.me.MusicPlay.dto.ErrorResponseDto;
-import rarlog.me.MusicPlay.dto.ExploreEntryDto;
-import rarlog.me.MusicPlay.dto.PlaylistDto;
+import rarlog.me.dto.AlbumDto;
+import rarlog.me.dto.AllMusicDto;
+import rarlog.me.dto.ErrorResponseDto;
+import rarlog.me.dto.ExploreEntryDto;
+import rarlog.me.dto.PlaylistDto;
 import rarlog.me.MusicPlay.service.MusicPlayService;
 
 @RestController

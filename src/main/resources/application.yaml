@@ -4,21 +4,19 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:postgresql://localhost:5432/db
-    username: admin
-    password: admin123
+    url: jdbc:postgresql://${DB_HOST}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASS}
   jpa:
     hibernate:
       ddl-auto: create
     show-sql: false
-misc:
-  dataPath: data.json
+search:
+  url: ${SEARCH_URL}
+  core: ${SEARCH_CORE}
 storage:
-  accessKey: GK07f3744cb06e129ce707975e
-  secretKey: 31cf4727b4601aa5e3c9116f5d76112dff2b8391e04e2dd6354b5c5fca10cd27
-  regionName: garage
-  bucketName: "music-play-playlist"
-  host: http://localhost:3900
-Solr:
-  url: http://localhost:8983/solr
-  core: music-play
+  host: ${STORAGE_HOST}
+  regionName: ${STORAGE_REGION_NAME}
+  bucketName: ${STORAGE_BUCKET_NAME}
+  accessKey: ${STORAGE_ACCESS_KEY}
+  secretKey: ${STORAGE_SECRET_KEY}
