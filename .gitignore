@@ -33,4 +33,5 @@ build/
 .vscode/
 
 ### User Specific ###
+dependencies
 .env
