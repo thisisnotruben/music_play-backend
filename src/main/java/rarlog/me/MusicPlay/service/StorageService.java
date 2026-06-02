@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,26 +11,20 @@ import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.errors.MinioException;
-import lombok.extern.log4j.Log4j2;
 import okhttp3.HttpUrl;
 
-@Log4j2
 @Service
 public class StorageService {
 
     private final String bucketName;
     private final MinioClient client;
 
-    public StorageService(
-            @Value("${storage.accessKey}") String accessKey,
-            @Value("${storage.secretKey}") String secretKey,
-            @Value("${storage.regionName}") String regionName,
-            @Value("${storage.bucketName}") String bucketName,
-            @Value("${storage.host}") String host) {
+    public StorageService(String url, String accessKey,
+            String secretKey, String regionName, String bucketName) {
 
         this.bucketName = bucketName;
         this.client = MinioClient.builder()
-                .endpoint(HttpUrl.get(host))
+                .endpoint(HttpUrl.get(url))
                 .region(regionName)
                 .credentials(accessKey, secretKey)
                 .build();

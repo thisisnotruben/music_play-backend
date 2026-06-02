@@ -18,12 +18,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import lombok.RequiredArgsConstructor;
 import rarlog.me.MusicPlay.controller.AccountController;
+import rarlog.me.MusicPlay.security.AppUserPrincipalDetailsService;
+import rarlog.me.MusicPlay.security.JwtFilter;
+import rarlog.me.MusicPlay.service.StorageService;
+import rarlog.me.Service.SearchService;
 import rarlog.me.repository.AlbumRepository;
 import rarlog.me.repository.ArtistRepository;
 import rarlog.me.repository.SongRepository;
-import rarlog.me.MusicPlay.security.AppUserPrincipalDetailsService;
-import rarlog.me.MusicPlay.security.JwtFilter;
-import rarlog.me.Service.SearchService;
 
 @Configuration
 @EnableWebSecurity
@@ -73,9 +74,25 @@ public class Config {
 
     @Bean
     public SearchService searchService(
-            @Value("${search.url}") String searchUrl,
-            @Value("${search.core}") String searchCore) {
-        return new SearchService(searchUrl, searchCore, artistRepository, albumRepository, songRepository);
+            @Value("${search.host}") String host,
+            @Value("${search.port}") String port,
+            @Value("${search.collection}") String collection) {
+
+        return new SearchService(String.format("%s:%s", host, port),
+                collection, artistRepository, albumRepository, songRepository);
+    }
+
+    @Bean
+    public StorageService storageService(
+            @Value("${storage.host}") String host,
+            @Value("${storage.hostPort}") String post,
+            @Value("${storage.regionName}") String regionName,
+            @Value("${storage.accessKey}") String accessKey,
+            @Value("${storage.secretKey}") String secretKey,
+            @Value("${storage.customBucket}") String bucketName) {
+
+        return new StorageService(String.format("%s:%s", host, post),
+                accessKey, secretKey, regionName, bucketName);
     }
 
 }
