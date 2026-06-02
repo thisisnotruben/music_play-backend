@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import rarlog.me.MusicPlay.exception.UserNotFoundException;
-import rarlog.me.MusicPlay.repository.AppUserRepository;
+import rarlog.me.repository.AppUserRepository;
 
 @Service
 @RequiredArgsConstructor

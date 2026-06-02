@@ -11,7 +11,7 @@ import rarlog.me.dto.AccountCreateDto;
 import rarlog.me.entity.AppUser;
 import rarlog.me.MusicPlay.exception.AccountAlreadyExistsException;
 import rarlog.me.MusicPlay.exception.UserNotFoundException;
-import rarlog.me.MusicPlay.repository.AppUserRepository;
+import rarlog.me.repository.AppUserRepository;
 import rarlog.me.MusicPlay.security.JWTService;
 
 @Service

@@ -18,9 +18,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import lombok.RequiredArgsConstructor;
 import rarlog.me.MusicPlay.controller.AccountController;
-import rarlog.me.MusicPlay.repository.AlbumRepository;
-import rarlog.me.MusicPlay.repository.ArtistRepository;
-import rarlog.me.MusicPlay.repository.SongRepository;
+import rarlog.me.repository.AlbumRepository;
+import rarlog.me.repository.ArtistRepository;
+import rarlog.me.repository.SongRepository;
 import rarlog.me.MusicPlay.security.AppUserPrincipalDetailsService;
 import rarlog.me.MusicPlay.security.JwtFilter;
 import rarlog.me.Service.SearchService;

@@ -20,12 +20,12 @@ import rarlog.me.entity.Song;
 import rarlog.me.MusicPlay.exception.PlaylistNotFoundException;
 import rarlog.me.MusicPlay.exception.SongNotFoundException;
 import rarlog.me.MusicPlay.exception.UserNotFoundException;
-import rarlog.me.MusicPlay.repository.AlbumRepository;
-import rarlog.me.MusicPlay.repository.AppUserRepository;
-import rarlog.me.MusicPlay.repository.ArtistRepository;
-import rarlog.me.MusicPlay.repository.PlaylistRepository;
-import rarlog.me.MusicPlay.repository.PlaylistSongRepository;
-import rarlog.me.MusicPlay.repository.SongRepository;
+import rarlog.me.repository.AlbumRepository;
+import rarlog.me.repository.AppUserRepository;
+import rarlog.me.repository.ArtistRepository;
+import rarlog.me.repository.PlaylistRepository;
+import rarlog.me.repository.PlaylistSongRepository;
+import rarlog.me.repository.SongRepository;
 
 @Service
 @RequiredArgsConstructor
