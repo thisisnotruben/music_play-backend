@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import rarlog.me.dto.ErrorResponseDto;
 import rarlog.me.MusicPlay.exception.AccountAlreadyExistsException;
+import rarlog.me.MusicPlay.exception.AlbumNotFoundException;
 import rarlog.me.MusicPlay.exception.ArtistNotFoundException;
 import rarlog.me.MusicPlay.exception.PlaylistNotFoundException;
 import rarlog.me.MusicPlay.exception.SongNotFoundException;
@@ -23,6 +24,7 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({
             ArtistNotFoundException.class,
+            AlbumNotFoundException.class,
             PlaylistNotFoundException.class,
             SongNotFoundException.class,
             UserNotFoundException.class,

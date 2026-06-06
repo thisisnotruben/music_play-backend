@@ -8,8 +8,6 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASS}
   jpa:
-    hibernate:
-      ddl-auto: create
     show-sql: false
 search:
   host: ${SEARCH_HOST}

@@ -19,14 +19,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import rarlog.me.MusicPlay.service.MusicPlayService;
 import rarlog.me.dto.AlbumDto;
-import rarlog.me.dto.AllMusicDto;
+import rarlog.me.dto.ArtistDto;
 import rarlog.me.dto.ErrorResponseDto;
 import rarlog.me.dto.ExploreEntryDto;
 import rarlog.me.dto.PlaylistDto;
-import rarlog.me.MusicPlay.service.MusicPlayService;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -40,11 +39,24 @@ public class MusicPlayController {
             @ApiResponse(responseCode = "200", description = "Ok", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class)))
     })
-    @PostMapping(value = "/createPlaylist", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void createPlaylist(HttpServletRequest httpServletRequest,
+    @PostMapping(value = "/createPlaylist", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public PlaylistDto createPlaylist(
             @RequestParam("playlistName") String playlistName,
             @RequestParam("file") Optional<MultipartFile> playlistCover) {
-        musicPlayService.createPlaylist(getUsername(), playlistName, playlistCover);
+        return musicPlayService.createPlaylist(getUsername(), playlistName, playlistCover);
+    }
+
+    @Operation(summary = "Edits a playlist")
+        @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "User or playlist not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class)))
+    })
+    @PutMapping(value = "/editPlaylist", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public PlaylistDto editPLaylist(
+            @RequestParam("playlistId") long playlistId,
+            @RequestParam("newName") Optional<String> newName,
+            @RequestParam("file") Optional<MultipartFile> playlistCover) {
+        return musicPlayService.editPlaylist(getUsername(), playlistId, newName, playlistCover);
     }
 
     @Operation(summary = "Delete a playlist")
@@ -53,32 +65,28 @@ public class MusicPlayController {
             @ApiResponse(responseCode = "404", description = "User or Playlist not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))),
     })
     @DeleteMapping("/deletePlaylist")
-    public void deletePlaylist(HttpServletRequest httpServletRequest,
-            @RequestParam("playlistId") int playlistId) {
+    public void deletePlaylist(@RequestParam("playlistId") long playlistId) {
         musicPlayService.deletePlaylist(getUsername(), playlistId);
     }
 
-    @Operation(summary = "Add song to a specific playlist")
+    @Operation(summary = "Add song to playlist")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "Song or Playlist not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class)))
     })
     @PutMapping("/addSongToPlaylist")
-    public void addSongToPlaylist(HttpServletRequest httpServletRequest,
-            @RequestParam("songId") int songId,
-            @RequestParam("playlistId") int playlistId) {
+    public void addSongToPlaylist(@RequestParam("songId") long songId, @RequestParam("playlistId") long playlistId) {
         musicPlayService.addSongToPlaylist(songId, playlistId);
     }
 
-    @Operation(summary = "Delete song from a specific playlist")
+    @Operation(summary = "Delete song from playlist")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "Song or Playlist not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class)))
     })
     @DeleteMapping("/deleteSongFromPlaylist")
-    public void deleteSongFromPlaylist(HttpServletRequest httpServletRequest,
-            @RequestParam("songId") int songId,
-            @RequestParam("playlistId") int playlistId) {
+    public void deleteSongFromPlaylist(@RequestParam("songId") long songId,
+            @RequestParam("playlistId") long playlistId) {
         musicPlayService.deleteSongfromPlaylist(songId, playlistId);
     }
 
@@ -92,6 +100,12 @@ public class MusicPlayController {
         return musicPlayService.getPlaylists(getUsername());
     }
 
+    @Operation(summary = "Get album")
+    @GetMapping("/getAlbum")
+    public AlbumDto getAlbum(@RequestParam("albumId") long albumId) {
+        return musicPlayService.getAlbum(albumId);
+    }
+
     @Operation(summary = "Get all albums")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = AlbumDto.class))))
@@ -99,6 +113,15 @@ public class MusicPlayController {
     @GetMapping("/getAlbums")
     public List<AlbumDto> getAlbums() {
         return musicPlayService.getAlbums();
+    }
+
+    @Operation(summary = "Get all artists")
+    @GetMapping("/getArtists")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = ArtistDto.class))))
+    })
+    public List<ArtistDto> getArtists() {
+        return musicPlayService.getArtists();
     }
 
     @Operation(summary = "Get explore feed")
@@ -109,15 +132,6 @@ public class MusicPlayController {
     @GetMapping("/getExploreFeed")
     public List<ExploreEntryDto> getExploreFeed() {
         return musicPlayService.getExploreFeed();
-    }
-
-    @Operation(summary = "Get all music of library entire")
-    @GetMapping("/getAllMusic")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Ok", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = AllMusicDto.class))))
-    })
-    public List<AllMusicDto> getAllMusic() {
-        return musicPlayService.getAllMusic();
     }
 
     private String getUsername() {

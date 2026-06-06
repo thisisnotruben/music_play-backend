@@ -12,9 +12,3 @@ password: `admin123`
 ```bash
 psql -h localhost -p 5432 -d db -U admin
 ```
-
-## Buld & run
-```bash
-gradlew build
-java -jar build/libs/MusicPlay-0.0.1-SNAPSHOT.jar
-```

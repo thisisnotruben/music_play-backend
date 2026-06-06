@@ -1,5 +1,6 @@
 package rarlog.me.MusicPlay.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -9,17 +10,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
+import rarlog.me.MusicPlay.exception.AlbumNotFoundException;
+import rarlog.me.MusicPlay.exception.PlaylistNotFoundException;
+import rarlog.me.MusicPlay.exception.SongNotFoundException;
+import rarlog.me.MusicPlay.exception.UserNotFoundException;
 import rarlog.me.dto.AlbumDto;
-import rarlog.me.dto.AllMusicDto;
+import rarlog.me.dto.ArtistDto;
 import rarlog.me.dto.ExploreEntryDto;
 import rarlog.me.dto.PlaylistDto;
 import rarlog.me.entity.AppUser;
 import rarlog.me.entity.Playlist;
 import rarlog.me.entity.PlaylistSong;
+import rarlog.me.entity.PlaylistSongKey;
 import rarlog.me.entity.Song;
-import rarlog.me.MusicPlay.exception.PlaylistNotFoundException;
-import rarlog.me.MusicPlay.exception.SongNotFoundException;
-import rarlog.me.MusicPlay.exception.UserNotFoundException;
 import rarlog.me.repository.AlbumRepository;
 import rarlog.me.repository.AppUserRepository;
 import rarlog.me.repository.ArtistRepository;
@@ -39,13 +42,14 @@ public class MusicPlayService {
     private final ArtistRepository artistRepository;
     private final StorageService storageService;
 
-    public void createPlaylist(String username, String playlistName, Optional<MultipartFile> file) {
+    public PlaylistDto createPlaylist(String username, String playlistName, Optional<MultipartFile> file) {
         AppUser user = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
 
         Playlist playlist = playlistRepository.save(Playlist.builder()
                 .coverPath("")
                 .name(playlistName)
+                .playlistSongs(new ArrayList<PlaylistSong>())
                 .appUser(user)
                 .build());
 
@@ -55,6 +59,31 @@ public class MusicPlayService {
             playlist.setCoverPath(uploadedPlaylistPath);
             playlistRepository.save(playlist);
         }
+        return new PlaylistDto(playlist);
+    }
+
+    public PlaylistDto editPlaylist(String username, long playlistId, Optional<String> newName,
+            Optional<MultipartFile> file) {
+
+        AppUser user = appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
+        Playlist playlist = playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new PlaylistNotFoundException());
+
+        newName.ifPresent(n -> playlist.setName(n));
+
+        if (file.isPresent()) {
+            if (!playlist.getCoverPath().isEmpty()) {
+                storageService.deletePlaylistCover(playlist.getCoverPath());
+            }
+
+            String uploadedPlaylistPath = storageService.uploadPlaylistCover(
+                    user.getId(), playlist.getId(), file.get());
+            playlist.setCoverPath(uploadedPlaylistPath);
+        }
+
+        playlistRepository.save(playlist);
+        return new PlaylistDto(playlist);
     }
 
     public void deletePlaylist(String username, long playlistId) {
@@ -63,10 +92,8 @@ public class MusicPlayService {
         Playlist playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new PlaylistNotFoundException());
 
-        for (PlaylistSong playlistSong : playlist.getPlaylistSongs()) {
-            playlistSongRepository.delete(playlistSong);
-        }
-        
+        playlistSongRepository.deleteAll(playlist.getPlaylistSongs());
+
         user.getPlaylists().remove(playlist);
         if (!playlist.getCoverPath().isEmpty()) {
             storageService.deletePlaylistCover(playlist.getCoverPath());
@@ -84,12 +111,7 @@ public class MusicPlayService {
     }
 
     public void deleteSongfromPlaylist(long songId, long playlistId) {
-        Song song = songRepository.findById(songId)
-                .orElseThrow(() -> new SongNotFoundException());
-        Playlist playlist = playlistRepository.findById(playlistId)
-                .orElseThrow(() -> new PlaylistNotFoundException());
-
-        playlistSongRepository.delete(new PlaylistSong(song, playlist));
+        playlistSongRepository.deleteById(new PlaylistSongKey(songId, playlistId));
     }
 
     public List<PlaylistDto> getPlaylists(String username) {
@@ -99,6 +121,11 @@ public class MusicPlayService {
         return user.getPlaylists().stream()
                 .map(playlist -> new PlaylistDto(playlist))
                 .collect(Collectors.toList());
+    }
+
+    public AlbumDto getAlbum(long albumId) {
+        return new AlbumDto(albumRepository.findById(albumId)
+                .orElseThrow(() -> new AlbumNotFoundException()));
     }
 
     public List<AlbumDto> getAlbums() {
@@ -111,9 +138,9 @@ public class MusicPlayService {
         throw new NotImplementedException("TODO");
     }
 
-    public List<AllMusicDto> getAllMusic() {
+    public List<ArtistDto> getArtists() {
         return artistRepository.findAll().stream()
-                .map(artist -> new AllMusicDto(artist.getName(), artist.getAlbums().stream()
+                .map(artist -> new ArtistDto(artist.getName(), artist.getAlbums().stream()
                         .map(album -> new AlbumDto(album))
                         .collect(Collectors.toList())))
                 .collect(Collectors.toList());
