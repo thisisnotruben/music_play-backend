@@ -19,4 +19,4 @@ storage:
   regionName: ${STORAGE_REGION_NAME}
   accessKey: ${STORAGE_ACCESS_KEY}
   secretKey: ${STORAGE_SECRET_KEY}
-  customBucket: ${STORAGE_CUSTOM_BUCKET}
+  playlistBucket: ${STORAGE_PLAYLIST_BUCKET}

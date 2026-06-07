@@ -89,10 +89,10 @@ public class Config {
             @Value("${storage.regionName}") String regionName,
             @Value("${storage.accessKey}") String accessKey,
             @Value("${storage.secretKey}") String secretKey,
-            @Value("${storage.customBucket}") String bucketName) {
+            @Value("${storage.playlistBucket}") String playlistBucket) {
 
         return new StorageService(String.format("%s:%s", host, post),
-                accessKey, secretKey, regionName, bucketName);
+                accessKey, secretKey, regionName, playlistBucket);
     }
 
 }
