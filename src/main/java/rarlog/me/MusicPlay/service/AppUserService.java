@@ -7,12 +7,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import rarlog.me.dto.AccountCreateDto;
-import rarlog.me.entity.AppUser;
 import rarlog.me.MusicPlay.exception.AccountAlreadyExistsException;
 import rarlog.me.MusicPlay.exception.UserNotFoundException;
-import rarlog.me.repository.AppUserRepository;
 import rarlog.me.MusicPlay.security.JWTService;
+import rarlog.me.dto.AccountCreateDto;
+import rarlog.me.dto.AppUserDto;
+import rarlog.me.entity.AppUser;
+import rarlog.me.repository.AppUserRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,10 @@ public class AppUserService {
         }
         accountCreateDto.setPassword(passwordEncoder.encode(accountCreateDto.getPassword()));
         appUserRepository.save(new AppUser(accountCreateDto));
+    }
+
+    public AppUserDto getAccountInfo(String username) {
+        return new AppUserDto(getUser());
     }
 
     public String verify(String username, String password) {

@@ -2,6 +2,7 @@ package rarlog.me.MusicPlay.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +22,7 @@ import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import rarlog.me.MusicPlay.service.AppUserService;
 import rarlog.me.dto.AccountCreateDto;
+import rarlog.me.dto.AppUserDto;
 import rarlog.me.dto.ErrorResponseDto;
 import rarlog.me.dto.LoginResponseDto;
 
@@ -53,6 +55,12 @@ public class AccountController {
     public LoginResponseDto login(@RequestParam("username") String username,
             @RequestParam("password") String password) {
         return new LoginResponseDto(appUserService.verify(username, password));
+    }
+
+    @Operation(summary = "Get account info")
+    @GetMapping(path = "getAccountInfo", produces = MediaType.APPLICATION_JSON_VALUE)
+    public AppUserDto getAccountInfo() {
+        return appUserService.getAccountInfo(getUsername());
     }
 
     @Operation(summary = "Edit username")
