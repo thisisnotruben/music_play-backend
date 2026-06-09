@@ -2,6 +2,10 @@
 
 A mock of spotify.
 
+## TODO
+- security
+- explore feed
+
 ## API Docs
 - [Swagger UI](http://localhost:8080/swagger-ui/index.html)
 - [Open API JSON](http://localhost:8080/v3/api-docs)
@@ -10,5 +14,5 @@ A mock of spotify.
 ## Connect to database
 password: `admin123`
 ```bash
-psql -h localhost -p 5432 -d db -U admin
+psql -h localhost -p 5432 -d music_play -U admin
 ```
