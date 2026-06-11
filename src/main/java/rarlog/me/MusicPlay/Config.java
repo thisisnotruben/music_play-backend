@@ -43,7 +43,7 @@ public class Config {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(AccountController.REQUEST_MAPPING.concat("/create"),
                                 AccountController.REQUEST_MAPPING.concat("/login"),
-                                "/swagger-ui/**", "/v3/api-docs/**", "/api/v1/**")
+                                "/swagger-ui/**", "/v3/api-docs/**", "/actuator/health", "/api/v1/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
