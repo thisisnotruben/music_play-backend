@@ -45,8 +45,7 @@ public class StorageService {
 
             return uploadedFilePath;
 
-        } catch (IOException e) {
-        } catch (MinioException e) {
+        } catch (IOException | MinioException _) {
         }
         return "";
     }
@@ -57,7 +56,7 @@ public class StorageService {
                     .bucket(bucketName)
                     .object(coverPath)
                     .build());
-        } catch (MinioException e) {
+        } catch (MinioException _) {
         }
     }
 

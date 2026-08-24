@@ -9,6 +9,19 @@ spring:
     password: ${DB_PASS}
   jpa:
     show-sql: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AUTH_ISSUER_URI}
+          jwk-set-uri: ${AUTH_JWK_SET_URI}
+          jws-algorithms: ${AUTH_JWS_ALGORITHMS}
+          audiences: ${AUTH_AUDIENCES}
+  rabbitmq:
+    host: ${RABBIT_HOST}
+    port: ${RABBIT_PORT}
+    username: ${RABBIT_USERNAME}
+    password: ${RABBIT_PASSWORD}
 search:
   host: ${SEARCH_HOST}
   port: ${SEARCH_HOST_PORT}
@@ -20,3 +33,6 @@ storage:
   accessKey: ${STORAGE_ACCESS_KEY}
   secretKey: ${STORAGE_SECRET_KEY}
   playlistBucket: ${STORAGE_PLAYLIST_BUCKET}
+message:
+  user:
+    queueName: ${RABBIT_USER_QUEUE}

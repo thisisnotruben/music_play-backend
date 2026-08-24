@@ -1,18 +1,5 @@
 package rarlog.me.MusicPlay.controller;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,12 +7,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import rarlog.me.MusicPlay.service.MusicPlayService;
-import rarlog.me.dto.AlbumDto;
-import rarlog.me.dto.ArtistDto;
-import rarlog.me.dto.ErrorResponseDto;
-import rarlog.me.dto.ExploreEntryDto;
-import rarlog.me.dto.PlaylistDto;
+import rarlog.me.MusicPlay.service.UserIdService;
+import rarlog.me.dto.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -33,6 +25,7 @@ import rarlog.me.dto.PlaylistDto;
 public class MusicPlayController {
 
     private final MusicPlayService musicPlayService;
+    private final UserIdService userIdService;
 
     @Operation(summary = "Create a playlist")
     @ApiResponses(value = {
@@ -41,22 +34,24 @@ public class MusicPlayController {
     })
     @PostMapping(value = "/createPlaylist", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public PlaylistDto createPlaylist(
+            @AuthenticationPrincipal Jwt jwt,
             @RequestParam("playlistName") String playlistName,
             @RequestParam("file") Optional<MultipartFile> playlistCover) {
-        return musicPlayService.createPlaylist(getUsername(), playlistName, playlistCover);
+        return musicPlayService.createPlaylist(userIdService.getUserId(jwt), playlistName, playlistCover);
     }
 
     @Operation(summary = "Edits a playlist")
-        @ApiResponses(value = {
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "User or playlist not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class)))
     })
     @PutMapping(value = "/editPlaylist", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public PlaylistDto editPLaylist(
+            @AuthenticationPrincipal Jwt jwt,
             @RequestParam("playlistId") long playlistId,
             @RequestParam("newName") Optional<String> newName,
             @RequestParam("file") Optional<MultipartFile> playlistCover) {
-        return musicPlayService.editPlaylist(getUsername(), playlistId, newName, playlistCover);
+        return musicPlayService.editPlaylist(userIdService.getUserId(jwt), playlistId, newName, playlistCover);
     }
 
     @Operation(summary = "Delete a playlist")
@@ -65,8 +60,8 @@ public class MusicPlayController {
             @ApiResponse(responseCode = "404", description = "User or Playlist not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class))),
     })
     @DeleteMapping("/deletePlaylist")
-    public void deletePlaylist(@RequestParam("playlistId") long playlistId) {
-        musicPlayService.deletePlaylist(getUsername(), playlistId);
+    public void deletePlaylist(@AuthenticationPrincipal Jwt jwt, @RequestParam("playlistId") long playlistId) {
+        musicPlayService.deletePlaylist(userIdService.getUserId(jwt), playlistId);
     }
 
     @Operation(summary = "Add song to playlist")
@@ -86,8 +81,8 @@ public class MusicPlayController {
     })
     @DeleteMapping("/deleteSongFromPlaylist")
     public void deleteSongFromPlaylist(@RequestParam("songId") long songId,
-            @RequestParam("playlistId") long playlistId) {
-        musicPlayService.deleteSongfromPlaylist(songId, playlistId);
+                                       @RequestParam("playlistId") long playlistId) {
+        musicPlayService.deleteSongFromPlaylist(songId, playlistId);
     }
 
     @Operation(summary = "Get all playlists from user")
@@ -96,8 +91,8 @@ public class MusicPlayController {
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponseDto.class)))
     })
     @GetMapping("/getPlaylists")
-    public List<PlaylistDto> getPlaylists() {
-        return musicPlayService.getPlaylists(getUsername());
+    public List<PlaylistDto> getPlaylists(@AuthenticationPrincipal Jwt jwt) {
+        return musicPlayService.getPlaylists(userIdService.getUserId(jwt));
     }
 
     @Operation(summary = "Get album")
@@ -132,10 +127,6 @@ public class MusicPlayController {
     @GetMapping("/getExploreFeed")
     public List<ExploreEntryDto> getExploreFeed() {
         return musicPlayService.getExploreFeed();
-    }
-
-    private String getUsername() {
-        return "admin";
     }
 
 }

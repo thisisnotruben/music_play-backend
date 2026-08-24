@@ -1,75 +1,80 @@
 package rarlog.me.MusicPlay;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import lombok.RequiredArgsConstructor;
-import rarlog.me.MusicPlay.controller.AccountController;
-import rarlog.me.MusicPlay.security.AppUserPrincipalDetailsService;
-import rarlog.me.MusicPlay.security.JwtFilter;
 import rarlog.me.MusicPlay.service.StorageService;
 import rarlog.me.Service.SearchService;
 import rarlog.me.repository.AlbumRepository;
 import rarlog.me.repository.ArtistRepository;
 import rarlog.me.repository.SongRepository;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class Config {
 
+    public final static String AUTH_USER_EVENT_QUEUE_NAME = "${message.user.queueName}";
+
     private final ArtistRepository artistRepository;
     private final AlbumRepository albumRepository;
     private final SongRepository songRepository;
-    private final JwtFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(AccountController.REQUEST_MAPPING.concat("/create"),
-                                AccountController.REQUEST_MAPPING.concat("/login"),
-                                "/swagger-ui/**", "/v3/api-docs/**", "/actuator/health", "/api/v1/**")
-                        .permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/actuator/health").permitAll()
                         .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2ResourceServer(server ->
+                        server.jwt(Customizer.withDefaults()))
                 .build();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    public OpenAPI openAPI() {
 
-    @Bean
-    public AuthenticationProvider authenticationProvider(
-            AppUserPrincipalDetailsService appUserPrincipalDetailsService,
-            PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(appUserPrincipalDetailsService);
-        provider.setPasswordEncoder(passwordEncoder);
-        return provider;
-    }
+        List<SecurityRequirement> securityRequirementList = Arrays.asList(new SecurityRequirement().
+                addList("BearerAuth"), new SecurityRequirement().
+                addList("BasicAuth"));
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
-        return config.getAuthenticationManager();
+        Map<String, SecurityScheme> securitySchemeMap = new HashMap<>();
+        securitySchemeMap.put("BearerAuth", new SecurityScheme()
+                .type(SecurityScheme.Type.HTTP)
+                .bearerFormat("JWT")
+                .scheme("bearer"));
+        securitySchemeMap.put("BasicAuth", new SecurityScheme()
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("basic"));
+
+        return new OpenAPI()
+                .info(new Info().title("Music Play API")
+                        .description("Used for the querying of account/music services.")
+                        .version("1.0"))
+                .security(securityRequirementList)
+                .components(new Components().securitySchemes(securitySchemeMap));
     }
 
     @Bean
@@ -89,7 +94,7 @@ public class Config {
             @Value("${storage.regionName}") String regionName,
             @Value("${storage.accessKey}") String accessKey,
             @Value("${storage.secretKey}") String secretKey,
-            @Value("${storage.playlistBucket}") String playlistBucket) {    
+            @Value("${storage.playlistBucket}") String playlistBucket) {
 
         return new StorageService(String.format("%s:%s", host, post),
                 accessKey, secretKey, regionName, playlistBucket);
