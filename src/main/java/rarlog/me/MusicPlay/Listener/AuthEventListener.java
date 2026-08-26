@@ -21,9 +21,14 @@ public class AuthEventListener {
     private final AppUserRepository appUserRepository;
 
     @RabbitListener(queues = {Config.AUTH_USER_EVENT_QUEUE_NAME})
-    public void consume(String jsonString) throws JsonProcessingException {
+    public void consume(String jsonString) {
 
-        JsonNode payload = mapper.readTree(jsonString);
+        JsonNode payload = null;
+        try {
+            payload = mapper.readTree(jsonString);
+        } catch (JsonProcessingException ignored) {
+
+        }
 
         if (!payload.hasNonNull("type")
         && !payload.hasNonNull("details")
