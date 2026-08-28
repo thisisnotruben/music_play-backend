@@ -41,7 +41,6 @@ public class MusicPlayService {
     private final AlbumRepository albumRepository;
     private final ArtistRepository artistRepository;
     private final StorageService storageService;
-    private final UserIdService UserIdService;
 
     public PlaylistDto createPlaylist(String userId, String playlistName, Optional<MultipartFile> file) {
         AppUser user = appUserRepository.findByUserId(userId)

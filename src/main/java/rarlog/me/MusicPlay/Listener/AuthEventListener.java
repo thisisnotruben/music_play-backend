@@ -22,6 +22,9 @@ public class AuthEventListener {
 
     @RabbitListener(queues = {Config.AUTH_USER_EVENT_QUEUE_NAME})
     public void consume(String jsonString) {
+        if (jsonString == null) {
+            return;
+        }
 
         JsonNode payload = null;
         try {
@@ -37,7 +40,7 @@ public class AuthEventListener {
         }
 
         JsonNode details = payload.get("details");
-        String userId = details.get("user_id").asText();
+        String userId = payload.get("user_id").asText();
 
         switch (payload.get("type").asText()) {
             case "REGISTER":
